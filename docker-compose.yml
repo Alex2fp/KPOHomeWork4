@@ -1,0 +1,65 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  orders-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ordersdb
+    ports:
+      - "5433:5432"
+
+  payments-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: paymentsdb
+    ports:
+      - "5434:5432"
+
+  orders-service:
+    build: ./src/OrdersService
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ORDERS_CONNECTION_STRING: Host=orders-db;Port=5432;Database=ordersdb;Username=postgres;Password=postgres;
+      RABBITMQ_HOST: rabbitmq
+      PAYMENT_REQUEST_QUEUE: order.payment.requested
+      PAYMENT_STATUS_QUEUE: payment.status.changed
+    ports:
+      - "8081:8080"
+    depends_on:
+      - orders-db
+      - rabbitmq
+
+  payments-service:
+    build: ./src/PaymentsService
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      PAYMENTS_CONNECTION_STRING: Host=payments-db;Port=5432;Database=paymentsdb;Username=postgres;Password=postgres;
+      RABBITMQ_HOST: rabbitmq
+      PAYMENT_REQUEST_QUEUE: order.payment.requested
+      PAYMENT_STATUS_QUEUE: payment.status.changed
+    ports:
+      - "8082:8080"
+    depends_on:
+      - payments-db
+      - rabbitmq
+
+  api-gateway:
+    build: ./src/ApiGateway
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ORDERS_BASE_URL: http://orders-service:8080
+      PAYMENTS_BASE_URL: http://payments-service:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - orders-service
+      - payments-service

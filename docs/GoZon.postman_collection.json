@@ -1,0 +1,62 @@
+{
+  "info": {
+    "name": "GoZon API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create account",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "X-User-Id", "value": "user-1" }],
+        "url": { "raw": "{{baseUrl}}/payments/accounts", "host": ["{{baseUrl}}"], "path": ["payments", "accounts"] },
+        "body": { "mode": "raw", "raw": "{\n  \"initialBalance\": 0\n}" }
+      }
+    },
+    {
+      "name": "Deposit",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-User-Id", "value": "user-1" }],
+        "url": { "raw": "{{baseUrl}}/payments/accounts/deposit", "host": ["{{baseUrl}}"], "path": ["payments", "accounts", "deposit"] },
+        "body": { "mode": "raw", "raw": "{\n  \"amount\": 150\n}" }
+      }
+    },
+    {
+      "name": "Balance",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-User-Id", "value": "user-1" }],
+        "url": { "raw": "{{baseUrl}}/payments/accounts/balance", "host": ["{{baseUrl}}"], "path": ["payments", "accounts", "balance"] }
+      }
+    },
+    {
+      "name": "Create order",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-User-Id", "value": "user-1" }],
+        "url": { "raw": "{{baseUrl}}/orders/orders", "host": ["{{baseUrl}}"], "path": ["orders", "orders"] },
+        "body": { "mode": "raw", "raw": "{\n  \"amount\": 100,\n  \"description\": \"Gift box\"\n}" }
+      }
+    },
+    {
+      "name": "List orders",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-User-Id", "value": "user-1" }],
+        "url": { "raw": "{{baseUrl}}/orders/orders", "host": ["{{baseUrl}}"], "path": ["orders", "orders"] }
+      }
+    },
+    {
+      "name": "Get order status",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-User-Id", "value": "user-1" }],
+        "url": { "raw": "{{baseUrl}}/orders/orders/:id", "host": ["{{baseUrl}}"], "path": ["orders", "orders", ":id"] }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" }
+  ]
+}
